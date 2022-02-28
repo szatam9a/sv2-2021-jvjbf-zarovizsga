@@ -42,10 +42,9 @@ public class ShippingService {
 
     public List<Transportable> sortInternationalPackagesByDistance() {
         List<InternationalPackage> internationalPackages = new LinkedList<>();
-        List<Transportable> result;
         transportables
                 .stream()
                 .filter(e -> e instanceof InternationalPackage).forEach(e -> internationalPackages.add((InternationalPackage) e));
-        return result = List.copyOf(internationalPackages.stream().sorted(Comparator.comparingInt(InternationalPackage::getDistance)).toList());
+        return List.copyOf(internationalPackages.stream().sorted(Comparator.comparingInt(InternationalPackage::getDistance)).toList());
     }
 }
