@@ -24,7 +24,6 @@ public class ProductRepository {
     }
 
     public long insertProduct(String productName, int price, int stock) {
-        long id;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "insert into products(product_name,price,stock) values(?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
