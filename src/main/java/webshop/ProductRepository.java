@@ -2,45 +2,47 @@ package webshop;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Optional;
 
 public class ProductRepository {
+    private EntityManagerFactory entityManagerFactory;
     private DataSource dataSource;
-    private JdbcTemplate jdbcTemplate;
+
 
 
     public ProductRepository(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        entityManagerFactory = Persistence.createEntityManagerFactory("pu");
     }
 
-    Product findProductById(long id) {
-        return (jdbcTemplate.queryForObject("select * from products where id = ?",
-                (rs, rowNum) -> new Product(rs.getLong("id"), rs.getString("product_name"),
-                        rs.getInt("price"), rs.getInt("stock"))
-                , id));
+    public Product findProductById(long id) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Product item = em.find(Product.class, id);
+        em.close();
+        return item;
+    }
+    public long insertProduct(String productName, int price, int stock){
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Product entity = new Product(productName,price,stock);
+        System.out.println(entity.getId());
+        em.getTransaction().begin();
+        em.persist(entity);
+        em.getTransaction().commit();
+        em.close();
+        return entity.getId();
     }
 
-    public long insertProduct(String productName, int price, int stock) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "insert into products(product_name,price,stock) values(?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, productName);
-            preparedStatement.setInt(2, price);
-            preparedStatement.setInt(3, stock);
-            preparedStatement.executeUpdate();
-            try (ResultSet rs = preparedStatement.getGeneratedKeys()) {
-                if (rs.next()) return rs.getLong(1);
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        throw new IllegalArgumentException("No id error");
-    }
 
     public void updateProductStock(long id, int amount) {
-        jdbcTemplate.update("update products  set stock = stock -? where id = ? ", amount, id);
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Product product = em.find(Product.class, id);
+        em.getTransaction().begin();
+        product.setStock(product.getStock()-amount);
+        em.getTransaction().commit();
     }
 }

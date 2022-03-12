@@ -1,16 +1,34 @@
 package webshop;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "products")
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
-    private String ProductName;
+    @Column(name = "product_name")
+    private String productName;
+
     private double price;
-    private int Stock;
+    private int stock;
+
+    public Product() {
+    }
+
+    public Product(String productName, double price, int stock) {
+        this.productName = productName;
+        this.price = price;
+        this.stock = stock;
+    }
 
     public Product(long id, String productName, double price, int stock) {
         this.id = id;
-        ProductName = productName;
+        this.productName = productName;
         this.price = price;
-        Stock = stock;
+        this.stock = stock;
     }
 
     public long getId() {
@@ -18,7 +36,7 @@ public class Product {
     }
 
     public String getProductName() {
-        return ProductName;
+        return productName;
     }
 
     public double getPrice() {
@@ -26,6 +44,22 @@ public class Product {
     }
 
     public int getStock() {
-        return Stock;
+        return stock;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }
